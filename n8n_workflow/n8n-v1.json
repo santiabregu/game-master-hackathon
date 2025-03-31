@@ -1,0 +1,3349 @@
+{
+  "name": "Knave",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -560,
+        330
+      ],
+      "id": "fb1ac4fe-9c06-4818-b6fb-5b82ea8aaf8f",
+      "name": "Telegram Trigger2",
+      "webhookId": "0b8fc00c-dfbe-4f63-a795-df07955a64c8",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger2').item.json.message.text }}",
+        "options": {
+          "systemMessage": "=Eres un Maestro de Juego para un juego de rol de fantasía que utiliza el sistema Knave. El usuario se comunica a través de un bot de Telegram.\n\nEste es el historial reciente de la conversación entre tú y el jugador:\n\n{{ $('get conv').item.json.chat }}\n\nUtiliza este contexto para interpretar respuestas breves o ambiguas. Por ejemplo:\n\n- Si el usuario dice “Mina” justo después de listar personajes, interpreta que probablemente quiere ver o seleccionar ese personaje.\n- Si el usuario responde “sí”, “ver”, “jugar”, o menciona un nombre sin contexto, interpreta su intención basada en los mensajes anteriores.\n- Si acabas de listar personajes y el usuario menciona uno, responde preguntando si desea ver su ficha o seleccionarlo.\n- Si el mensaje anterior del bot fue una pregunta como: “¿Quieres jugar como Dorian o ver su ficha?” y el usuario responde “ver”, infiere que desea ver a Dorian.\n\n---\n\nDebes responder ÚNICAMENTE con un objeto JSON válido como el siguiente, y nunca incluir nada fuera de él:\n\n{\n  \"response\": \"Texto para enviar al usuario\",\n  \"action\": \"create_character\" | \"view_character\" | \"delete_character\" | \"story\" | \"unknown\" | \"list_characters\" | \"battle\" | \"greet\" | \"select_character\" | \"stop_battle\",\n  \"name\": \"Nombre del personaje si se necesita\",\n  \"index\": número si se necesita (empezando desde 0)\n}\n\n---\n\nTus tareas principales son:\n\n- Crear un nuevo personaje si el usuario escribe algo como: \"crear personaje Lulu\"\n- Mostrar personajes existentes si el usuario dice: \"ver personaje Mina\"\n- Eliminar un personaje si el usuario dice: \"eliminar personaje Dorian\"\n- Listar personajes si el usuario dice algo como: \"listar personajes\", \"quiero listar mis personajes\", \"ver mis personajes\", \"mostrar personajes\", \"elegir personaje\" o \"mostrar opciones\" — responde con \"action\": \"list_characters\"\n- Comenzar una batalla si el usuario dice: \"luchar contra monstruo\" o \"empezar combate\". Responde con entusiasmo e intención de iniciar el combate, y establece la acción como \"battle\" (sin verificar si el jugador ya ha seleccionado un personaje; esa validación se hace en el sistema).\n- Permitir que el usuario seleccione un personaje existente si escribe algo como: \"jugar como Mina\" o \"seleccionar personaje Dorian\"\n\n---\n\nSi el usuario saluda o escribe algo informal como: “hola”, “buenas”, “empezar”, “quiero jugar” o “¿listo para jugar?”, responde con entusiasmo y asume el rol de un *Maestro de Juego carismático y misterioso*. Usa emojis medievales o fantásticos si lo deseas (como 🏰, 🧙, ⚔, 📜).\n\nDale la bienvenida como si estuviera a punto de comenzar una gran aventura. Invítalo a:\n\n- 🛠 Crear un nuevo personaje escribiendo por ejemplo: \"crear personaje Elandra\"\n- 🧙‍♂ Seleccionar uno de sus héroes escribiendo: \"seleccionar [nombre del personaje]\"\n- 📜 Ver su lista de personajes escribiendo: \"listar personajes\"\n- 💀 Eliminar uno de sus personajes escribiendo: \"borrar [nombre del personaje]\"\n\nEstablece la acción como: \"greet\"\n\n---\n\n### ✅ Nueva instrucción para detener combate:\n\nSi el usuario dice algo como: “dejar batalla”, “terminar combate”, “rendirse” o cualquier otra frase que indique que desea abandonar el combate activo, responde con un mensaje narrativo confirmando su decisión y establece \"action\": \"stop_battle\".\n\n---\n\n### ⚔ Instrucciones en combate:\n\nSi el jugador está actualmente en combate (status = \"IN_BATTLE\") y responde con una acción de combate como:\n\n- \"atacar\"\n- \"defenderse\"\n- \"esconderse\"\n\nEntonces responde con:\n\n{\n  \"response\": \"Texto opcional\",\n  \"action\": \"battle_action\",\n  \"nextAction\": \"attack\" | \"defend\" | \"hide\"\n}\n\n---\n\nSi la solicitud es confusa o no corresponde al juego, responde con:\n\n{\n  \"response\": \"No entendí tu intención. ¿Quieres crear, jugar o ver un personaje?\",\n  \"action\": \"unknown\"\n}\n\nNO devuelvas markdown, explicaciones ni texto fuera del JSON."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        320,
+        230
+      ],
+      "id": "bab66196-fdf6-4180-92d5-50bed5863d70",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        280,
+        440
+      ],
+      "id": "a85f102d-45fd-4d90-ad94-7f61dfe74d5e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "2nq6YTXNwytdckrD",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('parse answ').item.json.action }}",
+                    "rightValue": "=create_character",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "67f0341f-0a61-4e4f-a69b-69775cbb141b"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a587c40b-1ce6-416c-bbb3-6b31bd8d31cb",
+                    "leftValue": "={{ $('parse answ').item.json.action }}",
+                    "rightValue": "delete_character",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "63ab8287-4f2f-4fad-b2c4-b71b8e4441c7",
+                    "leftValue": "={{ $('parse answ').item.json.action }}",
+                    "rightValue": "view_character",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "78e64e55-49b8-4095-99f3-51821f185e78",
+                    "leftValue": "={{ $('parse answ').item.json.action }}",
+                    "rightValue": "list_characters",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "11390087-7439-419e-b71f-877ede2c7a14",
+                    "leftValue": "={{ $('parse answ').item.json.action }}",
+                    "rightValue": "greet",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c782fd92-1ff8-477d-83f7-4b5f9503c92e",
+                    "leftValue": "={{ $('parse answ').item.json.action }}",
+                    "rightValue": "select_character",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e7fc7490-86f2-467a-ac58-7b9454f6af52",
+                    "leftValue": "={{ $('parse answ').item.json.action }}",
+                    "rightValue": "battle",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "29d5a7fc-621e-4101-8350-f8653b960189",
+                    "leftValue": "={{ $('parse answ').item.json.action }}",
+                    "rightValue": "battle_action",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8eb448d9-048d-411e-970a-dda34d00c0af",
+                    "leftValue": "={{ $('parse answ').item.json.action }}",
+                    "rightValue": "stop_battle",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        916,
+        -46
+      ],
+      "id": "39e78447-9114-4230-8554-af494784da31",
+      "name": "Switch4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.airtable.com/v0/appoCkbcTt9boyCFD/characters",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer patU9yU9nACK9qemB.deb241b4c3915f3d60d99afb1ec152f7f50a187abf005146c37325a2f8b77bd0"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"fields\": {\n    \"nombre\": \"{{$json.nombre}}\",\n    \"fuerza\": {{$json.fuerza}},\n    \"destreza\": {{$json.destreza}},\n    \"constitucion\": {{$json.constitucion}},\n    \"inteligencia\": {{$json.inteligencia}},\n    \"sabiduria\": {{$json.sabiduria}},\n    \"carisma\": {{$json.carisma}},\n    \"hp\": {{$json.hp}},\n    \"telegramId\": {{ $json.telegramId }}\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1796,
+        -1120
+      ],
+      "id": "7f024ab7-adbe-4430-ab4c-502972fb634c",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "function roll3d6() {\n  const rolls = [1,2,3].map(() => Math.floor(Math.random() * 6) + 1);\n  const min = Math.min(...rolls);\n  return {\n    bonus: min,\n    defense: min + 10\n  };\n}\n\nconst stats = {\n  fuerza: roll3d6(),\n  destreza: roll3d6(),\n  constitucion: roll3d6(),\n  inteligencia: roll3d6(),\n  sabiduria: roll3d6(),\n  carisma: roll3d6(),\n};\n\nconst hp = Math.floor(Math.random() * 8) + 1;\n\nreturn [\n  {\n    json: {\n      nombre:$('parse answ').first().json.name ,\n      fuerza: stats.fuerza.bonus,\n      destreza: stats.destreza.bonus,\n      constitucion: stats.constitucion.bonus,\n      inteligencia: stats.inteligencia.bonus,\n      sabiduria: stats.sabiduria.bonus,\n      carisma: stats.carisma.bonus,\n      hp: hp,\n      telegramId: $('parse answ').first().json.telegramId\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1576,
+        -1120
+      ],
+      "id": "a5ab87c3-ee31-4614-9f89-8dc3ad72acb4",
+      "name": "Code3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1356,
+        -370
+      ],
+      "id": "a83e2cfd-2893-4817-97f6-9bce87bc4bd4",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.all().map(i => i.json);\n\nconst ai = inputs.find(i => i.name); // input que viene del agente (name = \"Pipi\")\nconst characters = inputs.filter(i => i.nombre); // todos los personajes de Airtable\n\nconst selected = characters.find(c => c.nombre?.toLowerCase().trim() === ai.name?.toLowerCase().trim());\n\nif (!selected) {\n  return [{\n    json: {\n      response: `❌ No encontré un personaje llamado \"${ai.name}\".`,\n      chat_id: ai.telegramId\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...ai,\n    ...selected\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1576,
+        -370
+      ],
+      "id": "388c1c5d-d2b2-4149-b7d5-2a3a836d7819",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nconst charName = data.name?.trim().toLowerCase();\nconst recordName = data.nombre?.trim().toLowerCase();\n\nif (charName !== recordName) {\n  return [{\n    json: {\n      response: `❌ No encontré un personaje llamado \"${data.name}\".`,\n      chat_id: data.telegramId\n    }\n  }];\n}\n\n// 🧙 Success response with flair\nreturn [{\n  json: {\n    response: `🧾 *Ficha de ${data.nombre}*:\\n` +\n              `❤️ *HP*: ${data.hp}\\n\\n` +\n              `📊 *Atributos:*\\n` +\n              `- ⚔️ Fuerza: ${data.fuerza}\\n` +\n              `- 🏃 Destreza: ${data.destreza}\\n` +\n              `- 🛡️ Constitución: ${data.constitucion}\\n` +\n              `- 📚 Inteligencia: ${data.inteligencia}\\n` +\n              `- 🔮 Sabiduría: ${data.sabiduria}\\n` +\n              `- 😎 Carisma: ${data.carisma}`,\n    selectedCharacter: {\n      nombre: data.nombre,\n      fuerza: data.fuerza,\n      destreza: data.destreza,\n      constitucion: data.constitucion,\n      inteligencia: data.inteligencia,\n      sabiduria: data.sabiduria,\n      carisma: data.carisma,\n      hp: data.hp\n    },\n    chat_id: data.telegramId\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1796,
+        -370
+      ],
+      "id": "293042f6-c748-4a39-9788-497ed5a8d0f3",
+      "name": "Code4"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1356,
+        -670
+      ],
+      "id": "c2649b37-71b5-4a2f-9e4a-485b88c63062",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.all().map(i => i.json);\n\nconst ai = inputs.find(i => i.name); // el input del bot\nconst characters = inputs.filter(i => i.nombre); // todos los personajes\n\nconst toDelete = characters.find(c => \n  c.nombre?.toLowerCase().trim() === ai.name?.toLowerCase().trim()\n);\n\nif (!toDelete) {\n  return [{\n    json: {\n      response: `❌ No encontré ningún personaje llamado \"${ai.name}\".`,\n      chat_id: ai.telegramId\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...ai,\n    ...toDelete\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1576,
+        -670
+      ],
+      "id": "e121e9a3-a91a-4d8d-adf5-99e47cb90f15",
+      "name": "Code6"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\n// Confirm character name exists and matches\nconst targetName = (data.name || \"\").trim().toLowerCase();\nconst recordName = (data.nombre || \"\").trim().toLowerCase();\n\nif (targetName !== recordName) {\n  return [{\n    json: {\n      response: `❌ No encontré un personaje llamado \"${data.name}\".`,\n      chat_id: data.telegramId\n    }\n  }];\n}\n\n// ✅ Character found — proceed to delete and confirm\nreturn [{\n  json: {\n    recordId: data.id, // Airtable record ID\n    telegramId: data.telegramId,\n    nombre: data.nombre,\n    response: `🗑️ El personaje *${data.nombre}* ha sido eliminado con éxito. Puedes crear uno nuevo cuando quieras.`\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1796,
+        -670
+      ],
+      "id": "1e698906-7ba0-48da-81d5-c6d55ae5144f",
+      "name": "Code7"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// No items found at all\nif (items.length === 0) {\n  return [{\n    json: {\n      response: \"❌ No tienes personajes aún. Usa 'crear personaje NOMBRE' para comenzar.\",\n      chat_id: $('parse answ').first().json.telegramId\n    }\n  }];\n}\n\n// Get telegramId safely from first item\nconst first = items[0].json;\n\n// Try both .fields.nombre or flat .nombre\nconst list = items\n  .map((item, i) => {\n    const nombre = item.json.fields?.nombre || item.json.nombre;\n    return nombre ? `${i + 1}. ${nombre}` : null;\n  })\n  .filter(Boolean)\n  .join('\\n');\n\nreturn [{\n  json: {\n    response: list.length > 0\n      ? `📜 Tus personajes:\\n\\n${list}\\n\\n🧙‍♂️ ¿Quieres ver uno en particular o seleccionarlo para empezar una batalla?`\n      : \"❌ No se encontraron personajes.\",\n    chat_id: $('parse answ').first().json.telegramId\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1356,
+        -95
+      ],
+      "id": "e9ae0c4d-1025-4ec5-ad47-5122e9f00190",
+      "name": "Code"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1356,
+        155
+      ],
+      "id": "60e41283-4ccb-4339-ad36-a116353d6233",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.all();\nconst ai = inputs.find(i => i.json.action);\nconst characters = inputs.filter(i => !i.json.action);\n\n// Función para normalizar los nombres\nconst normalize = str =>\n  str?.toLowerCase().trim().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\");\n\nconst selectedCharacter = characters.find(\n  c => normalize(c.json.nombre) === normalize(ai.json.name)\n);\n\nif (!selectedCharacter) {\n  return [\n    {\n      json: {\n        response: `❌ No encontré ningún personaje llamado \"${ai.json.name}\".`,\n        action: \"unknown\",\n        chat_id: ai.json.telegramId\n      }\n    }\n  ];\n}\n\nreturn [\n  {\n    json: {\n      ...ai.json,\n      ...selectedCharacter.json\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1576,
+        155
+      ],
+      "id": "e725422f-45cf-4616-9e69-11319f1c74d5",
+      "name": "Code8"
+    },
+    {
+      "parameters": {
+        "jsCode": "function uuidv4() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n    const r = Math.random() * 16 | 0;\n    const v = c === 'x' ? r : (r & 0x3 | 0x8);\n    return v.toString(16);\n  });\n}\n\nconst data = $input.first().json;\n\n// This is safe now — your data is the character itself\nconst sessionPayload = {\n  telegramId: data.telegramId.toString(),\n  characterName: data.nombre,\n  sessionId: uuidv4(),\n  status: \"READY\",\n  startedAt: new Date().toISOString(),\n  updatedAt: new Date().toISOString()\n};\n\nreturn [{\n  json: {\n    response:\n`🎮*${data.nombre}*.\n\n📜 Estadísticas:\n❤️ HP: ${data.hp}\n💪 Fuerza: +${data.fuerza}\n🏃 Destreza: +${data.destreza}\n🛡️ Constitución: +${data.constitucion}\n🧠 Inteligencia: +${data.inteligencia}\n👁️ Sabiduría: +${data.sabiduria}\n😎 Carisma: +${data.carisma}\n\nEscribe \"luchar contra monstruo\" para comenzar el combate.`,\n    chat_id: data.telegramId,\n    fields: sessionPayload\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1796,
+        155
+      ],
+      "id": "986964dd-df70-4daa-b1ec-960179b0af2b",
+      "name": "Code9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.airtable.com/v0/appoCkbcTt9boyCFD/sessions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer patU9yU9nACK9qemB.deb241b4c3915f3d60d99afb1ec152f7f50a187abf005146c37325a2f8b77bd0"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ fields: $('If').item.json.fields }) }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2832,
+        -145
+      ],
+      "id": "d50c84cf-06cd-453c-860d-1074eefe5e39",
+      "name": "HTTP Request2",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "filterByFormula": "={status} = 'READY'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1136,
+        605
+      ],
+      "id": "c71f10ed-8eed-4621-b250-5ac249dd608e",
+      "name": "Airtable",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "filterByFormula": "=AND(   {telegramId} = '{{ $('Code6').item.json.telegramId }}',   {characterName} = '{{ $('Code6').item.json.name }}' )",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2392,
+        -745
+      ],
+      "id": "c0239dde-810b-44c5-b47f-7e0a33e048ba",
+      "name": "Airtable1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteRecord",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "id": "={{ $('Code6').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2612,
+        -745
+      ],
+      "id": "b2d442ba-9d63-4113-a4cc-494b6e73c2c0",
+      "name": "Airtable2",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "filterByFormula": "={telegramId} = '{{ $json.fields.telegramId }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2392,
+        -145
+      ],
+      "id": "70d2f976-c1ca-41c5-910a-18875505262d",
+      "name": "Airtable3",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteRecord",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "id": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2612,
+        -145
+      ],
+      "id": "5dcd3e9e-1cac-4d46-9a57-62953cebf56f",
+      "name": "Airtable4",
+      "alwaysOutputData": false,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "88e838ae-3b52-4f15-a4a0-0d0d17dfe9ea",
+              "leftValue": "={{ $json.fields !== undefined }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2094,
+        155
+      ],
+      "id": "c720b541-f08f-4296-a7ac-dc265d3553e9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ee0a0f65-91d6-4498-b8e7-e35d510bda6c",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "READY",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1356,
+        605
+      ],
+      "id": "c40bf56b-a1f4-4ffd-8be0-6611c6563f77",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2392,
+        505
+      ],
+      "id": "196d22d8-ad48-4cf5-8684-bab685a7f109",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst monster = input.monster || {};\n\nconst descripcion = monster.notes || '';\nconst nombre = monster.name || '???';\n\nconst mensaje = `👁️ Algo se mueve entre las sombras...\\n\\n${$('Code1').first().json.monster.notes}\\n\\n*¿Qué harás?*\\nOpciones: atacar 🗡️, defender 🛡️, esconderse 🐒, huir 🏃`;\n\nreturn [{\n  json: {\n    response: mensaje,\n    nextAction: \"await_battle_choice\",\n    monster,\n    character: {\n      nombre: input.nombre,\n      fuerza: input.fuerza,\n      destreza: input.destreza,\n      constitucion: input.constitucion,\n      inteligencia: input.inteligencia,\n      sabiduria: input.sabiduria,\n      carisma: input.carisma,\n      hp: input.hp\n    },\n    chat_id: input.telegramID\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3052,
+        505
+      ],
+      "id": "50994ec6-3497-4c93-8664-f26db7c3f3b2",
+      "name": "Code11"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1420,
+        1060
+      ],
+      "id": "752a7cd4-695d-46ee-bb8c-2653770ee40e",
+      "name": "Merge4"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblv3H9qnXjncGHaa",
+          "mode": "list",
+          "cachedResultName": "characters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblv3H9qnXjncGHaa"
+        },
+        "filterByFormula": "={nombre} = '{{ $('Airtable').item.json.characterName }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1576,
+        505
+      ],
+      "id": "74b32e78-d0bb-4fdf-9995-0c451fd0aafd",
+      "name": "Get character",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblpB97mHuwI5KaZa",
+          "mode": "list",
+          "cachedResultName": "monsters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblpB97mHuwI5KaZa"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1796,
+        430
+      ],
+      "id": "3ecfe7ab-2720-4f9d-8487-ebe34a3ccdf6",
+      "name": "Get monster",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\nconst character = {\n  nombre: input.nombre,\n  hp: input.hp,\n  fuerza: input.fuerza,\n  destreza: input.destreza,\n  constitucion: input.constitucion,\n  inteligencia: input.inteligencia,\n  sabiduria: input.sabiduria,\n  carisma: input.carisma\n};\n\nconst monster = {\n  name: input.name,\n  hd: input.hd,\n  ac: input.ac,\n  attackBonus: input.attackBonus,\n  damage: input.damage,\n  notes: input.notes\n};\n\nreturn [{\n  json: {\n    character,\n    monster,\n    telegramId: input.telegramID // Optional: pass it along if needed\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2612,
+        505
+      ],
+      "id": "eafd67f8-60ab-4d79-b545-488dcc5b24b3",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Airtable').first().json.id }}",
+            "status": "IN_BATTLE",
+            "characterData": "={{ JSON.stringify($json.character) }}\n",
+            "monsterData": "={{ JSON.stringify($json.monster) }}",
+            "updatedAt": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "telegramId",
+              "displayName": "telegramId",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "characterName",
+              "displayName": "characterName",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sessionId",
+              "displayName": "sessionId",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "READY",
+                  "value": "READY"
+                },
+                {
+                  "name": "IN_BATTLE",
+                  "value": "IN_BATTLE"
+                },
+                {
+                  "name": "FINISHED",
+                  "value": "FINISHED"
+                },
+                {
+                  "name": "7920475718",
+                  "value": "7920475718"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "startedAt",
+              "displayName": "startedAt",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "updatedAt",
+              "displayName": "updatedAt",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "monsterData",
+              "displayName": "monsterData",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "characterData",
+              "displayName": "characterData",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2832,
+        505
+      ],
+      "id": "fa012fff-5700-4809-a5c0-0b5828dc7c91",
+      "name": "Airtable5",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "filterByFormula": "=AND(\n  {telegramId} = '{{ $json.telegramId }}',\n  {status} = \"IN_BATTLE\"\n)\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1136,
+        1255
+      ],
+      "id": "5df3963c-ab1f-4e85-87f2-ee33242bfd58",
+      "name": "Airtable6",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\nreturn [{\n  json: {\n    telegramId:$input.first().json.telegramId ,\n    action: $input.first().json.nextAction, // like \"attack\", \"defend\", etc\n    character: JSON.parse(input.characterData),\n    monster: JSON.parse(input.monsterData)\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1576,
+        1055
+      ],
+      "id": "5c0b70bb-c8f2-400f-af78-ed4ad2ac9121",
+      "name": "Code10"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://knave-battle-7c9fc334b9e4.herokuapp.com/battle/start",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1796,
+        1055
+      ],
+      "id": "d5c1256c-b30b-47e7-b879-5c25f9657a95",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const gptOutput = $input.first().json;\nconst battleData = $('HTTP Request3').first().json;\n\nreturn [{\n  json: {\n    chat_id: $('Code10').first().json.telegramId,\n    response: gptOutput.output || gptOutput.response || \"🤔 El narrador está en silencio...\",\n    result: battleData.result, // <- esto es CLAVE\n    turn: battleData.turn,\n    characterHP: battleData.characterHP,\n    monsterHP: battleData.monsterHP,\n    nextOptions: battleData.nextOptions,\n    nextAction: battleData.result === 'ongoing' ? 'await_battle_choice' : null\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2392,
+        1055
+      ],
+      "id": "565835c1-50a1-4042-a2f9-cd04bf34dcae",
+      "name": "Code12"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.nextAction }}",
+                    "rightValue": "await_battle_choice",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e7e3feb6-1b70-4305-a428-bed4c5cc8013"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d0262147-7c23-4bad-9ad5-89b6a69493ca",
+                    "leftValue": "={{ $json.nextAction }}",
+                    "rightValue": "null",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2612,
+        1055
+      ],
+      "id": "6ef1aef9-842a-47d9-93fc-36ae6294d9d9",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger2').item.json.message.chat.id }}",
+        "text": "={{ $json.response }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2820,
+        760
+      ],
+      "id": "b1aac89d-1c26-4f4f-92e8-1306858d55be",
+      "name": "Telegram8",
+      "webhookId": "2c1fd5f0-8f00-4cb4-a4b8-326e1c5f7d79",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblv3H9qnXjncGHaa",
+          "mode": "list",
+          "cachedResultName": "characters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblv3H9qnXjncGHaa"
+        },
+        "filterByFormula": "={nombre} = \"{{ $('Code10').item.json.character.nombre }}\"",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3052,
+        905
+      ],
+      "id": "83692a06-2f2a-4091-b9d4-2806bc029e83",
+      "name": "get character",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteRecord",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblv3H9qnXjncGHaa",
+          "mode": "list",
+          "cachedResultName": "characters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblv3H9qnXjncGHaa"
+        },
+        "id": "={{ $('get character').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3712,
+        905
+      ],
+      "id": "00f14ae5-4847-4ce3-bf8c-cedbeb577b04",
+      "name": "delete character",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "filterByFormula": "={characterName} = \"{{ $json.nombre }}\"",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3272,
+        905
+      ],
+      "id": "2de11ba4-284a-40b3-aeb9-b3cfd1b9c526",
+      "name": "get session",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteRecord",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "id": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3492,
+        905
+      ],
+      "id": "f3081f14-7e94-4302-a653-3cb0663bdb0d",
+      "name": "Airtable7",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    chat_id: $('Telegram Trigger2').first().json.message.chat.id,\n    response: `💀 *$('get character').first().json.nombre* ha sido derrotado por la bestia y eliminado del registro.\\n\\n🧙‍♀️ Elige un nuevo personaje para continuar tu aventura. Usa el comando: *jugar como [nombre]*`\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3932,
+        905
+      ],
+      "id": "16a5fa2c-0a60-4bb6-813e-95116edda3fe",
+      "name": "Code13"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.result }}\n",
+                    "rightValue": "defeat",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d71cf4e8-7efb-443f-84cd-ba3babb5369c"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "eb35e189-92b9-417c-abf5-9516f1c804ed",
+                    "leftValue": "={{ $json.result }}\n",
+                    "rightValue": "victory",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2832,
+        1355
+      ],
+      "id": "cfa8c33c-11a1-4d05-ad6c-76e4d922edf1",
+      "name": "Switch1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const monsters = $input.all();\nconst randomIndex = Math.floor(Math.random() * monsters.length);\nreturn [monsters[randomIndex]];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2094,
+        430
+      ],
+      "id": "25d1efad-ce71-4e70-8056-a6f68d79e54a",
+      "name": "Code14"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblv3H9qnXjncGHaa",
+          "mode": "list",
+          "cachedResultName": "characters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblv3H9qnXjncGHaa"
+        },
+        "filterByFormula": "={telegramId} ={{ $('Telegram Trigger2').item.json.message.chat.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1136,
+        -95
+      ],
+      "id": "9a3d3731-4567-444d-815a-8af07d89ca87",
+      "name": "Airtable8",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblv3H9qnXjncGHaa",
+          "mode": "list",
+          "cachedResultName": "characters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblv3H9qnXjncGHaa"
+        },
+        "filterByFormula": "={telegramId} ={{ $('Telegram Trigger2').item.json.message.chat.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1136,
+        -295
+      ],
+      "id": "22117f88-69d8-4ddc-bfe2-5da9ad5b9644",
+      "name": "Airtable9",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblv3H9qnXjncGHaa",
+          "mode": "list",
+          "cachedResultName": "characters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblv3H9qnXjncGHaa"
+        },
+        "filterByFormula": "={telegramId} ={{ $('Telegram Trigger2').item.json.message.chat.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1136,
+        -595
+      ],
+      "id": "bf2ab28d-69e0-4ad9-ac99-2bce825fa88f",
+      "name": "Airtable10",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "75a771ab-06b6-49df-8771-be98e5a45b23",
+              "leftValue": "={{ $('Code6').item.json.name }}",
+              "rightValue": "={{ $('Code6').item.json.nombre }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2094,
+        -670
+      ],
+      "id": "a63f51d1-8771-4528-a85d-ab1effa14012",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblLwCUEjWy2MOwSV",
+          "mode": "list",
+          "cachedResultName": "chats",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblLwCUEjWy2MOwSV"
+        },
+        "filterByFormula": "={telegramId} = '{{ $json.message.chat.id }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -340,
+        330
+      ],
+      "id": "ebac62bf-0ebd-4809-b4e7-15e2a47d3286",
+      "name": "get conv",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "29cd370b-c190-4732-9b93-3367bcc4e737",
+              "leftValue": "={{ $json.id !== undefined }}",
+              "rightValue": "=undefined",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -120,
+        230
+      ],
+      "id": "be846da9-a65f-4c56-a7b7-3baa1d9ba6f4",
+      "name": "conv exists?"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblLwCUEjWy2MOwSV",
+          "mode": "list",
+          "cachedResultName": "chats",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblLwCUEjWy2MOwSV"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegramId": "={{ $('Telegram Trigger2').item.json.message.chat.id }}",
+            "lastUpdated": "={{  $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "telegramId",
+              "displayName": "telegramId",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "chat",
+              "displayName": "chat",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "lastUpdated",
+              "displayName": "lastUpdated",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        100,
+        305
+      ],
+      "id": "56672b55-4599-40af-b887-cabc7ca563d6",
+      "name": "create conv",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "let raw = $json.output || \"\";\nraw = raw.trim();\n\n// Clean code blocks if any\nif (raw.startsWith(\"```json\")) {\n  raw = raw.replace(/^```json/, \"\").replace(/```$/, \"\").trim();\n}\n\nlet parsed;\n\ntry {\n  parsed = JSON.parse(raw);\n} catch (e) {\n  parsed = {\n    action: \"unknown\",\n    response: \"😵 Lo siento, no entendí eso.\",\n  };\n}\n\n// Always include these identifiers\nparsed.chat_id = $json[\"message\"]?.[\"chat\"]?.[\"id\"] || $json[\"chat_id\"];\nparsed.telegramId = $('Telegram Trigger2').item.json.message.chat.id;\n\n// 🧠 NEW: Append conversation\nconst userInput = $json.message?.text || \"\";\nconst botResponse = parsed.response || \"\";\nconst previousChat = $json.chat || \"\";\n\nconst newTurn = `Usuario: ${userInput}\\nBot: ${botResponse}`;\nconst updatedChat = `${previousChat}\\n${newTurn}`.trim();\n\n// Limit to last 30 lines\nconst lines = updatedChat.split(\"\\n\").slice(-30);\nparsed.updatedChat = lines.join(\"\\n\");\n\n// Also keep original Airtable record ID if passed\nparsed.chatRecordId = $json.chatRecordId || $json.id;\n\nreturn { json: parsed };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        696,
+        855
+      ],
+      "id": "4e0b4b67-6571-41eb-8d22-d8f1b1f49e76",
+      "name": "parse answ"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger2').item.json.message.chat.id }}",
+        "text": "={{ $json.output.parseJson().response }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        696,
+        130
+      ],
+      "id": "73c7b4b9-378b-48bb-9334-a8c685de2d22",
+      "name": "Telegram9",
+      "webhookId": "18df3bd5-86b2-439c-8d1f-b9f6bb90ba06",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblv3H9qnXjncGHaa",
+          "mode": "list",
+          "cachedResultName": "characters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblv3H9qnXjncGHaa"
+        },
+        "filterByFormula": "={telegramId} ={{ $('Telegram Trigger2').item.json.message.chat.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1136,
+        230
+      ],
+      "id": "a779f8d3-b940-4b8a-9391-ba73eba1f4c7",
+      "name": "all charact",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblLwCUEjWy2MOwSV",
+          "mode": "list",
+          "cachedResultName": "chats",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblLwCUEjWy2MOwSV"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "telegramId": "={{ $json.telegramId }}",
+            "chat": "={{ $json.updatedChat }}"
+          },
+          "matchingColumns": [
+            "telegramId"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "telegramId",
+              "displayName": "telegramId",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "chat",
+              "displayName": "chat",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "lastUpdated",
+              "displayName": "lastUpdated",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        440,
+        860
+      ],
+      "id": "15be8362-c09d-4d0f-acc2-52d9acd385a4",
+      "name": "update convo",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawChat = $json.chat || \"\";\nconst lines = rawChat.split(\"\\n\");\n\nconst memory = [];\n\nfor (const line of lines) {\n  if (line.startsWith(\"Usuario:\")) {\n    memory.push({ role: \"user\", content: line.replace(\"Usuario:\", \"\").trim() });\n  } else if (line.startsWith(\"Bot:\")) {\n    memory.push({ role: \"assistant\", content: line.replace(\"Bot:\", \"\").trim() });\n  }\n}\n\n// Limit to last 10 pairs (20 messages)\nconst trimmed = memory.slice(-20);\n\nreturn memory.map(entry => ({ json: entry }));\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -120,
+        430
+      ],
+      "id": "8f957b34-b834-429d-88d2-c37a9872d22a",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{$json.telegramId}}",
+        "contextWindowLength": 6
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        468,
+        450
+      ],
+      "id": "b48c8d70-2b0f-4615-9fb7-6e3ca89d9e48",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblv3H9qnXjncGHaa",
+          "mode": "list",
+          "cachedResultName": "characters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblv3H9qnXjncGHaa"
+        },
+        "filterByFormula": "={nombre} = \"{{ $json.name }}\"",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1136,
+        -1020
+      ],
+      "id": "627042e3-c256-4706-a88b-e2e474d7db5b",
+      "name": "Airtable11",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "87935742-f20c-4cb1-993c-b1b2d301a370",
+              "leftValue": "={{$json.isEmpty()}}\n",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1356,
+        -1020
+      ],
+      "id": "06f05c10-0128-4bfd-a799-9ded0b016a82",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger2').item.json.message.chat.id }}",
+        "text": "={{ $('Code12').item.json.response }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3712,
+        1530
+      ],
+      "id": "c6104f10-3748-4bd5-9297-db594a5bd86b",
+      "name": "Telegram10",
+      "webhookId": "4a81377e-0513-4704-9352-a1a603f2ec80",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger2').item.json.message.chat.id }}",
+        "text": "={{ $('Code12').item.json.response }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4152,
+        905
+      ],
+      "id": "7d8d024d-8188-472a-90c4-3ff00300fd48",
+      "name": "Telegram7",
+      "webhookId": "4a81377e-0513-4704-9352-a1a603f2ec80",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger2').item.json.message.chat.id }}",
+        "text": "={{ $json.response }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1576,
+        705
+      ],
+      "id": "9d987cd0-73ab-4e4a-b9bb-0d1eec6f3a9b",
+      "name": "Telegram5",
+      "webhookId": "7c44deda-6d36-41db-ac1b-f1c10c9e8a03",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger2').item.json.message.chat.id }}",
+        "text": "={{ $json.response }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3272,
+        505
+      ],
+      "id": "93cd2a47-7086-4f58-aa01-ee7d09537153",
+      "name": "Telegram6",
+      "webhookId": "d708dd9d-7b86-4bce-949a-4c8e9f233660",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Code9').item.json.chat_id }}",
+        "text": "={{ $('Code9').item.json.response }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3052,
+        155
+      ],
+      "id": "35dc4732-7f76-4342-b88c-f5622d53f242",
+      "name": "Telegram4",
+      "webhookId": "5a47b248-7894-483c-9506-faf6acf8962c",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.response }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1576,
+        -95
+      ],
+      "id": "9747d8b0-2578-445b-b9d8-483a7c4c970a",
+      "name": "Telegram",
+      "webhookId": "177908bc-9ed0-4776-baf7-023de142dae3",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "={{ $json.response }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2094,
+        -370
+      ],
+      "id": "9a5591bf-3c89-4fd0-bbc6-7499344f0ef6",
+      "name": "Telegram3",
+      "webhookId": "5a47b248-7894-483c-9506-faf6acf8962c",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Code6').item.json.telegramId }}",
+        "text": "={{ $('Code7').item.json.response }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2832,
+        -670
+      ],
+      "id": "35551f3d-511e-4831-94b9-c762f9f3bc4d",
+      "name": "Telegram11",
+      "webhookId": "4169aa0a-8854-434e-a35e-9bfda73a0ac0",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('parse answ').item.json.telegramId }}",
+        "text": "⚠️ Ya existe un personaje con ese nombre. Intenta con otro, valiente aventurero.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1576,
+        -920
+      ],
+      "id": "e4ce02ce-cf23-4260-addf-ed9139a4b114",
+      "name": "Telegram12",
+      "webhookId": "62de9942-8ca6-48e2-abc1-e92c44c5fc7c",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.fields.telegramId }}",
+        "text": "=🛡️ ¡Personaje creado con éxito!\n\n👤 Nombre: *{{ $json.fields.nombre }}*\n❤️ HP: *{{ $json.fields.hp }}*\n\n📊 Atributos:\n- Fuerza: +{{ $json.fields.fuerza }}\n- Destreza: +{{ $json.fields.destreza }}\n- Constitución: +{{ $json.fields.constitucion }}\n- Inteligencia: +{{ $json.fields.inteligencia }}\n- Sabiduría: +{{ $json.fields.sabiduria }}\n- Carisma: +{{ $json.fields.carisma }}\n\nPrepárate para la aventura, *{{ $json.fields.nombre }}*...\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2094,
+        -1120
+      ],
+      "id": "3ac708fd-1f0e-464f-b4f1-2cc1c50bdeb4",
+      "name": "Telegram2",
+      "webhookId": "cb6da8a5-4e3e-4f71-93ea-3aadbef17228",
+      "credentials": {
+        "telegramApi": {
+          "id": "nRlN99A156sYuQgB",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "filterByFormula": "={telegramId} = {{ $('parse answ').item.json.telegramId }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1136,
+        1055
+      ],
+      "id": "33135d2d-7d0a-478c-9c86-30e07d476bfb",
+      "name": "Airtable12",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteRecord",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "id": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1356,
+        1255
+      ],
+      "id": "6dcb3ee6-2e30-426e-8a64-50cb80420ad4",
+      "name": "Airtable13",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=",
+        "options": {
+          "systemMessage": "=Eres un narrador épico de un juego de rol de fantasía. Toma el resumen de la batalla y conviértelo en un párrafo narrativo dramático.\n\nUsa un estilo evocador, con toques de suspenso y tensión. Agrega emojis si ayudan. No repitas literalmente las líneas: ¡narrálas!\n\nAquí está el resumen del turno {{ $json.turn }}:\n\n{{ $json.log }}\n\nSi el resultado de la batalla es \"defeat\", indica claramente en la narración que el personaje ha caído en combate y que no podrá volver a jugar con ese personaje. Sé solemne y trágico, como un final escrito en los anales de la historia.\n\nSi el resultado es \"ongoing\", al final del mensaje incluye de forma clara las siguientes dos líneas:\n\n1. Una línea con los puntos de vida actuales del personaje y la criatura, por ejemplo:  \n❤️ Jugador: 3 HP | 🧟 Basilisco: 12 HP\n\n2. SOLO SI AMBOS PUNTOS DE VIDA SON MAYORES QUE 0: Una línea que indique claramente las opciones disponibles para el jugador:  \n🎯 ¿Qué harás ahora? Opciones: atacar 🗡️, defender 🛡️, esconderse 🫥\n\nResultado: {{ $json.result }}\n\nDevuelve un solo párrafo descriptivo y épico que podría enviarse a un jugador de Telegram. No expliques nada, no agregues encabezados, solo la narrativa.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        2016,
+        1055
+      ],
+      "id": "27566a72-1c2c-48f9-9f18-604bd7f151ab",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2104,
+        1275
+      ],
+      "id": "e525147f-7254-48b1-a17d-baafbbf4694a",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "2nq6YTXNwytdckrD",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblv3H9qnXjncGHaa",
+          "mode": "list",
+          "cachedResultName": "characters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblv3H9qnXjncGHaa"
+        },
+        "filterByFormula": "={nombre} = \"{{ $('Code10').item.json.character.nombre }}\"",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3052,
+        1530
+      ],
+      "id": "5ef9d0ae-0900-4ff5-ab47-adc790e43a66",
+      "name": "get character1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "filterByFormula": "={characterName} = \"{{ $json.nombre }}\"",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3272,
+        1530
+      ],
+      "id": "6d407247-6e2b-4ae7-8c43-ce53ad1ecdfb",
+      "name": "get session1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteRecord",
+        "base": {
+          "__rl": true,
+          "value": "appoCkbcTt9boyCFD",
+          "mode": "list",
+          "cachedResultName": "KnaveCharacters",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblV6iZ7CSiiMdH4W",
+          "mode": "list",
+          "cachedResultName": "sessions",
+          "cachedResultUrl": "https://airtable.com/appoCkbcTt9boyCFD/tblV6iZ7CSiiMdH4W"
+        },
+        "id": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3492,
+        1530
+      ],
+      "id": "e56542a0-7631-4dba-906a-7f350ea612a1",
+      "name": "Airtable14",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "gQQaTqw48vZCCVFf",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger2": {
+      "main": [
+        [
+          {
+            "node": "get conv",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "parse answ",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Telegram9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch4": {
+      "main": [
+        [
+          {
+            "node": "Airtable11",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Airtable10",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Airtable9",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Airtable8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "all charact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Airtable6",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Airtable12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Telegram3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Code7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code7": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Code8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code8": {
+      "main": [
+        [
+          {
+            "node": "Code9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code9": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Telegram4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable1": {
+      "main": [
+        [
+          {
+            "node": "Airtable2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable2": {
+      "main": [
+        [
+          {
+            "node": "Telegram11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable3": {
+      "main": [
+        [
+          {
+            "node": "Airtable4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Airtable3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get character",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code11": {
+      "main": [
+        [
+          {
+            "node": "Telegram6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get character": {
+      "main": [
+        [
+          {
+            "node": "Get monster",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get monster": {
+      "main": [
+        [
+          {
+            "node": "Code14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Airtable5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable5": {
+      "main": [
+        [
+          {
+            "node": "Code11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable6": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge4": {
+      "main": [
+        [
+          {
+            "node": "Code10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code10": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code12": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Telegram8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram8": {
+      "main": [
+        [
+          {
+            "node": "Switch4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get character": {
+      "main": [
+        [
+          {
+            "node": "get session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "delete character": {
+      "main": [
+        [
+          {
+            "node": "Code13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get session": {
+      "main": [
+        [
+          {
+            "node": "Airtable7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable7": {
+      "main": [
+        [
+          {
+            "node": "delete character",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code13": {
+      "main": [
+        [
+          {
+            "node": "Telegram7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "get character",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "get character1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code14": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable8": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable9": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Airtable10": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Airtable1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get conv": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "conv exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "conv exists?": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "create conv",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "create conv": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parse answ": {
+      "main": [
+        [
+          {
+            "node": "update convo",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram9": {
+      "main": [
+        []
+      ]
+    },
+    "all charact": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "update convo": {
+      "main": [
+        []
+      ]
+    },
+    "Code2": {
+      "main": [
+        []
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable11": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram10": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram7": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram5": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram6": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram4": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram3": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram11": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram12": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram2": {
+      "main": [
+        []
+      ]
+    },
+    "Airtable12": {
+      "main": [
+        [
+          {
+            "node": "Airtable13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get character1": {
+      "main": [
+        [
+          {
+            "node": "get session1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get session1": {
+      "main": [
+        [
+          {
+            "node": "Airtable14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable14": {
+      "main": [
+        [
+          {
+            "node": "Telegram10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5ab97cf4-d898-4cef-9831-641070396028",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6580c46b4bb819c0e979c3f868bffc3a4799d40224741a00e48ad543b42f1fcf"
+  },
+  "id": "8YEY2CHIZqqkJYHY",
+  "tags": []
+}
